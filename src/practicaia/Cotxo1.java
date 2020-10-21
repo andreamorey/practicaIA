@@ -42,7 +42,7 @@ public class Cotxo1 extends Agent {
         
         
         for (int i = 0; i < estat.numObjectes; i++) {
-            if (estat.objectes[i].posicio.distancia(estat.posicio) < 20) {
+            if (estat.posicio.distancia(estat.objectes[i].posicio) < 20 ) {
                 if (estat.objectes[i].tipus == Agent.TACAOLI) {
                     //System.out.println("taca d'oli: ");
                     if (estat.objectes[i].sector >= 3) {
@@ -56,9 +56,6 @@ public class Cotxo1 extends Agent {
         
         
 
-        if (estat.enCollisio) {
-            System.out.println("Me he chocado");
-        }
         // Si volem repetir una determinada acció durant varies interaccions
         // ho hem de gestionar amb una variable (per exemple "espera") que faci
         // l'acció que volem durant el temps que necessitem
@@ -68,6 +65,39 @@ public class Cotxo1 extends Agent {
             return;
         } else {
 
+            ddreta = estat.distanciaVisors[DRETA];
+            desquerra = estat.distanciaVisors[ESQUERRA];
+            dcentral = estat.distanciaVisors[CENTRAL];
+            
+
+            if (estat.enCollisio && estat.veigAlgunEnemic  ) {
+               // System.out.println("Me he chocado");
+                enrere(1);
+                setVelocitatAngular(3);
+//                if (estat.sector)
+//                if (ddreta > desquerra) {
+//                    esquerra();
+//                } else {
+//                    dreta();
+//                }
+                espera = 20;
+                return;
+            }
+
+    //esquivar el coche cuando esta cerca
+            System.out.println("posicio enemic: " + estat.posicioEnemic[1]);
+            if (estat.veigAlgunEnemic && estat.posicio.distancia(estat.posicioEnemic[1]) < 100){
+                if (ddreta > desquerra) {
+                    dreta();
+                } else {
+                    esquerra();
+                }
+            }
+                // en contra direcció
+//            if (estat.contraDireccio && vaEndavant()){
+//                
+//                espera = 30;
+//            }
             if (estat.enCollisio && estat.distanciaVisors[CENTRAL] < 15) // evita fer-ho marxa enrera
             {
                 noGiris();
