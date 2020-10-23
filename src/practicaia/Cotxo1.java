@@ -13,15 +13,21 @@ public class Cotxo1 extends Agent {
     static final int CENTRAL = 1;
     static final int DRETA = 2;
     static final int COTXE = 1;
+    static final int PARED = 0;
+
+    int numDreta = 0;
+    int numEsquerra = 0;
 
     int VELOCITATTOPE = 5;
-    int VELOCITATFRE = 3;
+    int VELOCITATFRE = 4;
 
     Estat estat;
     int espera = 0;
     double desquerra, ddreta, dcentral;
-    
-    int espera2;
+
+    boolean aDreta; //(true si la distancia mes curta es la taca de la dreta)
+    double distancia;
+    double distanciaMin;
 
     public Cotxo1(Agents pare) {
         super(pare, "Cotxo", "imatges/CotxoV.png");
@@ -36,141 +42,117 @@ public class Cotxo1 extends Agent {
 
     @Override
     public void avaluaComportament() {
-        
         estat = estatCombat();  // Recuperam la informació actualitzada de l'entorn
-        
-        
-        
-        
-        
-
-        // Si volem repetir una determinada acció durant varies interaccions
-        // ho hem de gestionar amb una variable (per exemple "espera") que faci
-        // l'acció que volem durant el temps que necessitem
 
         if (espera > 0) {  // no facis res, continua amb el que estaves fent
             espera--;
             return;
+        }
+        setVelocitatAngular(9);
+        ddreta = estat.distanciaVisors[DRETA];
+        desquerra = estat.distanciaVisors[ESQUERRA];
+        dcentral = estat.distanciaVisors[CENTRAL];
+        numDreta = 0;
+        numEsquerra = 0;
+
+        if (estat.revolucions > 2500 && estat.marxa < 5 && dcentral > 200) {
+            endavant(estat.marxa + 1);
         } else {
-
-            ddreta = estat.distanciaVisors[DRETA];
-            desquerra = estat.distanciaVisors[ESQUERRA];
-            dcentral = estat.distanciaVisors[CENTRAL];
-            
-
-            if (estat.enCollisio && estat.veigAlgunEnemic) {
-               // System.out.println("Me he chocado");
-                enrere(1);
-                setVelocitatAngular(3);
-//                if (estat.sector)
-//                if (ddreta > desquerra) {
-//                    esquerra();
-//                } else {
-//                    dreta();
-//                }
-                espera = 20;
-                return;
-            }
-
-    //esquivar el coche cuando esta cerca
-            //System.out.println("posicio enemic: " + estat.posicioEnemic[1]);
-            if (estat.veigAlgunEnemic && estat.posicio.distancia(estat.posicioEnemic[1]) < 150){
-                System.out.println("Posicio enemic  " + estat.posicio.distancia(estat.posicioEnemic[1]));
-                if (ddreta > desquerra) {
-                    dreta();
-                } else {
-                    esquerra();
-                }
-                if (estat.marxa < 5) {
-                        if (estat.revolucions > 2000) {
-                            endavant(estat.marxa + 1);
-                        } else {
-                            endavant(estat.marxa);
-                        }
-                    }
-            }
-                // en contra direcció
-//            if (estat.contraDireccio && vaEndavant()){
-//                
-//                espera = 30;
-//            }
-            if (estat.enCollisio && estat.distanciaVisors[CENTRAL] < 15) // evita fer-ho marxa enrera
-            {
-                noGiris();
-
-                if (estat.distanciaVisors[CENTRAL] > 20) {
-                    if (estat.marxa < 5) {
-                        if (estat.revolucions > 1500) {
-                            endavant(estat.marxa + 1);
-                        } else {
-                            endavant(estat.marxa);
-                        }
-                    }
-                    //endavant(4);
-                    return;
-                }
-                enrere(1);
-                espera = 30;
-                return;
-            }
-
-            ddreta = estat.distanciaVisors[DRETA];
-            desquerra = estat.distanciaVisors[ESQUERRA];
-            dcentral = estat.distanciaVisors[CENTRAL];
-
-            if (dcentral > 400) {   //está en una recta
-                //endavant(VELOCITATTOPE); 
-                if (estat.marxa < 5) {
-                    if (estat.revolucions > 1500) {
-                        endavant(estat.marxa + 1);
-                    } else {
-                        endavant(estat.marxa);
-                    }
-                }
-            }
-
-            if (estat.objecteVisor[CENTRAL] == COTXE) //detecta coche con visor central
-            {
-                dispara();
-            }
-
-            // Per si vull anar el més recte possible: no sempre és la manera més ràpida
-            if ((desquerra > 40) && (ddreta > 40) && dcentral > 210) {
-                //endavant(VELOCITATTOPE);
-                if (estat.marxa < 5) {
-                    if (estat.revolucions > 1500) {
-                        endavant(estat.marxa + 1);
-                    } else {
-                        endavant(estat.marxa);
-                    }
-                }
-                noGiris();
-                return;
-            }
-            if (dcentral < 210 && estat.marxa > VELOCITATFRE) {
-
-                endavant(estat.marxa - 1);
-            }
-
-            if (estat.objecteVisor[CENTRAL] == 0 || estat.objecteVisor[ESQUERRA] == 0 || estat.objecteVisor[DRETA] == 0) {
-                if (ddreta > desquerra) {
-                    dreta();
-                } else {
-                    esquerra();
-                }
-            }
-
-            //endavant(4);
-            //endavant(VELOCITATFRE);
-            if (estat.marxa > 4 && estat.revolucions < 1500) {
-                if (ddreta < 20 || desquerra < 20) {
-                    endavant(estat.marxa + 1);
-                } else {
-                    endavant(estat.marxa - 1);
-                }
-            }
-
+            endavant(estat.marxa);
+            espera = 1;  // esto que es?
         }
 
+        for (int i = 0; i < estat.numObjectes; i++) {
+            if (estat.objectes[i].tipus == Agent.TACAOLI) {
+                distancia = estat.posicio.distancia(estat.objectes[i].posicio);
+                if (distancia < 100) {
+                    //System.out.println("Distancia taca oli " + distancia);
+                    if (distancia < distanciaMin) {
+                        distanciaMin = distancia;
+                    }
+                    if (estat.objectes[i].sector >= 3) {
+                        numDreta++;
+                        if (distancia > distanciaMin) {
+                            aDreta = true;
+                        }
+                    } else if (estat.objectes[i].sector <= 2 && estat.objectes[i].sector > 0) {
+                        numEsquerra++;
+                        if (distancia == distanciaMin) {
+                            aDreta = false;
+                        }
+                    }
+                }
+            }
+        }
+        if (numDreta > 0 || numEsquerra > 0) {
+            if (aDreta) {
+                esquerra();
+            } else {
+                dreta();
+            }
+        }
+        if (dcentral > 160 && (desquerra > 20) && (ddreta > 20)) {
+            noGiris();
+
+        } else {
+            if (estat.marxa >= VELOCITATFRE) {
+                endavant(estat.marxa - 1);
+                espera = 1;
+            }
+            //if (ddreta != desquerra) {
+            // setVelocitatAngular(8);
+
+            if (ddreta > desquerra) {
+                if (numDreta > 0 && aDreta) {
+                    esquerra();
+                } else {
+                    dreta();
+                }
+            } else {
+                if (numEsquerra > 0 && !aDreta) {
+                    dreta();
+                } else {
+                    esquerra();
+                }
+            }
+            //}
+        }
+
+        if (dcentral > 170) {
+            //endavant(VELOCITATTOPE);
+            setVelocitatAngular(6);
+        } else {
+            setVelocitatAngular(9);
+        }
+        // no ir en contra dirección :)
+        if (estat.contraDireccio) {
+            espera = 30;
+            setVelocitatAngular(5);
+            if (ddreta > desquerra) {
+                dreta();
+            } else {
+                esquerra();
+            }
+        }
+
+        // cuando choca con coche o pared
+        if (estat.enCollisio) {
+            //choca por detras
+            if ((estat.distanciaVisors[CENTRAL] > 15) && (estat.distanciaVisors[ESQUERRA] > 15) && (estat.distanciaVisors[DRETA] > 15)) {
+                endavant(1);
+            } else { //cocha por delante
+
+                //if (estat.objecteVisor[CENTRAL] == PARED || estat.objecteVisor[ESQUERRA] == PARED || estat.objecteVisor[DRETA] == PARED){
+                espera = 30;
+                noGiris();
+                enrere(2);
+            }
+        }
+
+        //detecta coche con visor central y dispara
+        if (estat.objecteVisor[CENTRAL] == COTXE) {
+            dispara();
+        }
     }
+
 }
