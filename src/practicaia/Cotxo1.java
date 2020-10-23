@@ -29,7 +29,6 @@ public class Cotxo1 extends Agent {
 
     @Override
     public void inicia() {
-        //setVelocitatLineal(1);
         setAngleVisors(40);
         setDistanciaVisors(350);
         setVelocitatAngular(9);
@@ -41,18 +40,7 @@ public class Cotxo1 extends Agent {
         estat = estatCombat();  // Recuperam la informació actualitzada de l'entorn
         
         
-        for (int i = 0; i < estat.numObjectes; i++) {
-            if (estat.posicio.distancia(estat.objectes[i].posicio) < 20 ) {
-                if (estat.objectes[i].tipus == Agent.TACAOLI) {
-                    //System.out.println("taca d'oli: ");
-                    if (estat.objectes[i].sector >= 3) {
-                        dreta();
-                    } else if (estat.objectes[i].sector <= 2 && estat.objectes[i].sector > 0) {
-                        esquerra();
-                    }
-                }
-            }
-        }
+        
         
         
 
@@ -70,7 +58,7 @@ public class Cotxo1 extends Agent {
             dcentral = estat.distanciaVisors[CENTRAL];
             
 
-            if (estat.enCollisio && estat.veigAlgunEnemic  ) {
+            if (estat.enCollisio && estat.veigAlgunEnemic) {
                // System.out.println("Me he chocado");
                 enrere(1);
                 setVelocitatAngular(3);
@@ -85,13 +73,21 @@ public class Cotxo1 extends Agent {
             }
 
     //esquivar el coche cuando esta cerca
-            System.out.println("posicio enemic: " + estat.posicioEnemic[1]);
-            if (estat.veigAlgunEnemic && estat.posicio.distancia(estat.posicioEnemic[1]) < 100){
+            //System.out.println("posicio enemic: " + estat.posicioEnemic[1]);
+            if (estat.veigAlgunEnemic && estat.posicio.distancia(estat.posicioEnemic[1]) < 150){
+                System.out.println("Posicio enemic  " + estat.posicio.distancia(estat.posicioEnemic[1]));
                 if (ddreta > desquerra) {
                     dreta();
                 } else {
                     esquerra();
                 }
+                if (estat.marxa < 5) {
+                        if (estat.revolucions > 2000) {
+                            endavant(estat.marxa + 1);
+                        } else {
+                            endavant(estat.marxa);
+                        }
+                    }
             }
                 // en contra direcció
 //            if (estat.contraDireccio && vaEndavant()){
