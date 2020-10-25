@@ -47,23 +47,30 @@ public class Cotxo1 extends Agent {
         desquerra = estat.distanciaVisors[ESQUERRA];
         dcentral = estat.distanciaVisors[CENTRAL];
         
+        if (dcentral > 250){
+            setAngleVisors(10);
+        } else{
+            setAngleVisors(40);
+        }
 
         if (estat.revolucions > 2500 && estat.marxa < 5 && dcentral > 200) {
             endavant(estat.marxa + 1);
-            setAngleVisors(10);
+            
         } else {
             endavant(estat.marxa);
-            espera = 1;  // esto que es?
+            
         }  
+        
+        
 
-        if (dcentral > 200 && (desquerra > 20) && (ddreta > 20)) {
+        if (dcentral > 200 && (desquerra > 30) && (ddreta > 30)) {
             noGiris();
         } else {
-            if (estat.marxa >= VELOCITATFRE) {
+            if (estat.marxa > VELOCITATFRE) {
                 endavant(estat.marxa - 1);
-                espera = 1;
+                
             }
-            setAngleVisors(40);
+            //setAngleVisors(40);
             if (ddreta > desquerra) {
                 dreta();
             } else {
@@ -100,7 +107,8 @@ public class Cotxo1 extends Agent {
         if (estat.objecteVisor[CENTRAL] == COTXE) {
             dispara();
         }
-
+        
+        //esquivar taques oli
         for (int i = 0; i < estat.numObjectes; i++) {
             if (estat.objectes[i].tipus == Agent.TACAOLI) {
                 distancia = estat.posicio.distancia(estat.objectes[i].posicio);
@@ -111,6 +119,7 @@ public class Cotxo1 extends Agent {
                         dreta();
                     }
                 }
+                //coger gasolina si queda poca
             }else if (estat.objectes[i].tipus == Agent.RECURSOS  && estat.fuel < 2000) {
                 distancia = estat.posicio.distancia(estat.objectes[i].posicio);
                 if (distancia < 100) {
