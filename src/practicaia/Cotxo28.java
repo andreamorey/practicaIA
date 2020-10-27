@@ -6,7 +6,7 @@
 package agents;
 
 // Exemple de Cotxo molt bàsic
-public class Cotxo1 extends Agent {
+public class Cotxo28 extends Agent {
 
     static final boolean DEBUG = true;
     static final int ESQUERRA = 0;
@@ -24,8 +24,8 @@ public class Cotxo1 extends Agent {
     double distanciaObj, distanciaVis;
     int altreCotxe;
 
-    public Cotxo1(Agents pare) {
-        super(pare, "Cotxo28", "imatges/CotxoV.png");
+    public Cotxo28(Agents pare) {
+        super(pare, "Cotxo28", "imatges/amarillo.PNG");
     }
 
     @Override
@@ -76,7 +76,6 @@ public class Cotxo1 extends Agent {
             if ((estat.distanciaVisors[CENTRAL] > 20)
                     && (estat.distanciaVisors[ESQUERRA] > 20)
                     && (estat.distanciaVisors[DRETA] > 20)) {
-                System.out.println("choco por detras");
                 atura();
                 endavant(2);
                 //choca por la izquierda
@@ -95,7 +94,6 @@ public class Cotxo1 extends Agent {
 //                espera = 5;
 
             } else { //choca por delante
-                System.out.println("choco por delante");
                 espera = 20;
                 noGiris();
                 enrere(2);

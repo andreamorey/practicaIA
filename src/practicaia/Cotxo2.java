@@ -24,7 +24,7 @@ public class Cotxo2 extends Agent {
     int altreCotxe;
 
     public Cotxo2(Agents pare) {
-        super(pare, "Rival", "imatges/cotxe2.gif");
+        super(pare, "Rival", "imatges/azulito.PNG");
     }
 
     @Override
@@ -37,7 +37,8 @@ public class Cotxo2 extends Agent {
     @Override
     public void avaluaComportament() {
 
-      estat = estatCombat();  // Recuperam la informació actualitzada de l'entorn
+    
+        estat = estatCombat();  // Recuperam la informació actualitzada de l'entorn
 
         altreCotxe = (estat.id + 1) % estat.numBitxos;
         if (espera > 0) {  // no facis res, continua amb el que estaves fent
@@ -68,7 +69,39 @@ public class Cotxo2 extends Agent {
         } else if (estat.angleVisors == 40) {
             distanciaVis = 75;
         }
+        
+        // cuando choca con coche o pared
+        if (estat.enCollisio) {
+            //choca por detras
+            if ((estat.distanciaVisors[CENTRAL] > 20)
+                    && (estat.distanciaVisors[ESQUERRA] > 20)
+                    && (estat.distanciaVisors[DRETA] > 20)) {
+                atura();
+                endavant(2);
+                //choca por la izquierda
+//            } else if ((estat.distanciaVisors[CENTRAL] > 15)
+//                    && (estat.distanciaVisors[ESQUERRA] <= 15)
+//                    && (estat.distanciaVisors[DRETA] > 15)) {
+//                dreta();
+//                endavant(1);
+//                espera = 5;
+//                //choca por la derecha
+//            } else if ((estat.distanciaVisors[CENTRAL] > 15)
+//                    && (estat.distanciaVisors[ESQUERRA] > 15)
+//                    && (estat.distanciaVisors[DRETA] <= 15)) {
+//                esquerra();
+//                endavant(1);
+//                espera = 5;
 
+            } else { //choca por delante
+                espera = 20;
+                noGiris();
+                enrere(2);
+
+            }
+            return;
+        }
+        
         if (dcentral > 180 && (desquerra > distanciaVis) && (ddreta > distanciaVis)) {
             noGiris();
         } else {
@@ -99,37 +132,7 @@ public class Cotxo2 extends Agent {
             }
         }
 
-        // cuando choca con coche o pared
-        if (estat.enCollisio) {
-            //choca por detras
-            if ((estat.distanciaVisors[CENTRAL] > 20)
-                    && (estat.distanciaVisors[ESQUERRA] > 20)
-                    && (estat.distanciaVisors[DRETA] > 20)) {
-                atura();
-                endavant(2);
-                //choca por la izquierda
-//            } else if ((estat.distanciaVisors[CENTRAL] > 15)
-//                    && (estat.distanciaVisors[ESQUERRA] <= 15)
-//                    && (estat.distanciaVisors[DRETA] > 15)) {
-//                dreta();
-//                endavant(1);
-//                espera = 5;
-//                //choca por la derecha
-//            } else if ((estat.distanciaVisors[CENTRAL] > 15)
-//                    && (estat.distanciaVisors[ESQUERRA] > 15)
-//                    && (estat.distanciaVisors[DRETA] <= 15)) {
-//                esquerra();
-//                endavant(1);
-//                espera = 5;
-
-            } else { //choca por delante
-                espera = 30;
-                noGiris();
-                enrere(2);
-
-            }
-            return;
-        }
+        
 
         //detecta coche con visor central y dispara
         if (estat.objecteVisor[CENTRAL] == COTXE) {
