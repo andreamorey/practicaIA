@@ -173,9 +173,11 @@ public class Cotxo28 extends Agent {
             } else if (estat.objectes[i].tipus == Agent.RECURSOS && estat.fuel < 2000) {
                 distanciaObj = estat.posicio.distancia(estat.objectes[i].posicio);
                 if (distanciaObj < 100) {
-                    if (estat.objectes[i].sector == 1) {
+                    setVelocitatAngular(6);
+                    espera = 3;
+                    if (estat.objectes[i].sector == 1 || estat.objectes[i].sector == 2) {
                         dreta();
-                    } else if (estat.objectes[i].sector == 4) {
+                    } else if (estat.objectes[i].sector == 3 || estat.objectes[i].sector == 4) {
                         esquerra();
                     }
                 }
@@ -190,3 +192,4 @@ public class Cotxo28 extends Agent {
 
     }
 }
+
