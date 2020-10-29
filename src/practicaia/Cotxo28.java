@@ -56,31 +56,52 @@ public class Cotxo28 extends Agent {
             setAngleVisors(40);
         }
 
-        if (estat.revolucions > 2500 && estat.marxa < 5 && dcentral > 200) {
-            endavant(estat.marxa + 1);
-
+        controlRevolucions();
+        controlCollisions();
+        controlGirs();
+        evitarContraDireccio();
+        veigEnemic();
+        esquivarObjectes();
+        posarOli();
+    }
+    private void controlGirs() {
+        if (dcentral > 180 && (desquerra > distanciaVis) && (ddreta > distanciaVis)) {
+            noGiris();
         } else {
-            endavant(estat.marxa);
+            if (dcentral > 180) {
+                setVelocitatAngular(7);
+                endavant(estat.marxa);
+            } else {
+                setVelocitatAngular(9);
+                if (estat.marxa > VELOCITATFRE) {
+                    endavant(estat.marxa - 1);
+                }
+            }
 
+            if (ddreta > desquerra) {
+                dreta();
+            } else {
+                esquerra();
+            }
         }
+    }
 
+    // cuando choca con coche o pared
+    private void controlCollisions(){
         if (estat.angleVisors == 10) {
             distanciaVis = 180;
         } else if (estat.angleVisors == 40) {
             distanciaVis = 75;
         }
-        
-        // cuando choca con coche o pared
+
         if (estat.enCollisio) {
             //choca por detras
-            if ((estat.distanciaVisors[CENTRAL] > 20)
-                    && (estat.distanciaVisors[ESQUERRA] > 20)
-                    && (estat.distanciaVisors[DRETA] > 20)) {
-                atura();
+            atura();
+            if ((dcentral > 20) && (desquerra > 20) && (ddreta > 20)) {
                 endavant(2);
                 //choca por la izquierda
-//            } else if ((estat.distanciaVisors[CENTRAL] > 15)
-//                    && (estat.distanciaVisors[ESQUERRA] <= 15)
+//            } else if ((dcentral > 15)
+//                    && (desquerra <= 15)
 //                    && (estat.distanciaVisors[DRETA] > 15)) {
 //                dreta();
 //                endavant(1);
@@ -101,27 +122,17 @@ public class Cotxo28 extends Agent {
             }
             return;
         }
-        
-        if (dcentral > 180 && (desquerra > distanciaVis) && (ddreta > distanciaVis)) {
-            noGiris();
+    }
+    private void controlRevolucions() {
+        if (estat.revolucions > 2500 && estat.marxa < 5 && dcentral > 200) {
+            endavant(estat.marxa + 1);
         } else {
-            if (dcentral > 180) {
-                setVelocitatAngular(7);
-                endavant(estat.marxa);
-            } else {
-                setVelocitatAngular(9);
-                if (estat.marxa > VELOCITATFRE) {
-                    endavant(estat.marxa - 1);
-                }
-            }
-            if (ddreta > desquerra) {
-                dreta();
-            } else {
-                esquerra();
-            }
+            endavant(estat.marxa);
         }
+    }
 
-        // no ir en contra dirección :)
+    // no ir en contra dirección :)
+    private void evitarContraDireccio() {
         if (estat.contraDireccio) {
             espera = 30;
             setVelocitatAngular(5);
@@ -131,15 +142,10 @@ public class Cotxo28 extends Agent {
                 esquerra();
             }
         }
+    }
 
-        
-
-        //detecta coche con visor central y dispara
-        if (estat.objecteVisor[CENTRAL] == COTXE) {
-            dispara();
-
-        }
-
+    
+    private void veigEnemic(){
         //esquivar coche si está cerca
         if (estat.veigAlgunEnemic && estat.posicio.distancia(estat.posicioEnemic[altreCotxe]) < 100) {
             if (estat.sector[altreCotxe] == 2) {
@@ -148,48 +154,63 @@ public class Cotxo28 extends Agent {
                 dreta();
             }
         }
+        
+        //detecta coche con visor central y dispara
+        if (estat.objecteVisor[CENTRAL] == COTXE) {
+            dispara();
 
+        }
+    }
+    //soltar taques oli si veo a otro coche
+    private void posarOli(){
+        if (estat.veigEnemic[altreCotxe] && estat.oli > 0) {
+            posaOli();
+        }
+    }
+    private void esquivarObjectes(){
+        // comprobamos que angulo tienen los visores
         if (estat.angleVisors == 10) {
             distanciaVis = 90;
         } else if (estat.angleVisors == 40) {
             distanciaVis = 30;
         }
-        //esquivar taques oli
+        
         for (int i = 0; i < estat.numObjectes; i++) {
             if (estat.objectes[i].tipus == Agent.TACAOLI) {
-                distanciaObj = estat.posicio.distancia(estat.objectes[i].posicio);
-                if (distanciaObj < 100) {
-                    if (estat.objectes[i].sector == 2 && estat.distanciaVisors[ESQUERRA] >= distanciaVis) {
-                        esquerra();
-                    } else if (estat.objectes[i].sector == 2 && estat.distanciaVisors[ESQUERRA] < distanciaVis) {
-                        dreta();
-                    } else if (estat.objectes[i].sector == 3 && estat.distanciaVisors[DRETA] >= distanciaVis) {
-                        dreta();
-                    } else if (estat.objectes[i].sector == 3 && estat.distanciaVisors[DRETA] < distanciaVis) {
-                        esquerra();
-                    }
-                }
-                //coger gasolina si queda poca
+                esquivarTaques(i);
+            //coger gasolina si queda poca
             } else if (estat.objectes[i].tipus == Agent.RECURSOS && estat.fuel < 2000) {
-                distanciaObj = estat.posicio.distancia(estat.objectes[i].posicio);
-                if (distanciaObj < 100) {
-                    setVelocitatAngular(6);
-                    espera = 3;
-                    if (estat.objectes[i].sector == 1 || estat.objectes[i].sector == 2) {
-                        dreta();
-                    } else if (estat.objectes[i].sector == 3 || estat.objectes[i].sector == 4) {
-                        esquerra();
-                    }
-                }
+                agafarRecursos(i);
             }
         }
-
-        //soltar taques oli (no va de momento)
-        // si el otro coche me está viendo
-        if (estat.veigEnemic[altreCotxe] && estat.oli > 0) {
-            posaOli();
+    }
+    private void esquivarTaques(int i) {
+        distanciaObj = estat.posicio.distancia(estat.objectes[i].posicio);
+        if (distanciaObj < 100) {
+            if (estat.objectes[i].sector == 2 && desquerra >= distanciaVis) {
+                esquerra();
+            } else if (estat.objectes[i].sector == 2 && desquerra < distanciaVis) {
+                dreta();
+            } else if (estat.objectes[i].sector == 3 && ddreta >= distanciaVis) {
+                dreta();
+            } else if (estat.objectes[i].sector == 3 && ddreta < distanciaVis) {
+                esquerra();
+            }
         }
-
+    }
+    
+    private void agafarRecursos(int i){
+        distanciaObj = estat.posicio.distancia(estat.objectes[i].posicio);
+        if (distanciaObj < 100) {
+            setVelocitatAngular(6);
+            //espera = 3;  // andrea he comentado estoooo
+            if (estat.objectes[i].sector == 1 || estat.objectes[i].sector == 2) {
+                dreta();
+            } else if (estat.objectes[i].sector == 3 || estat.objectes[i].sector == 4) {
+                esquerra();
+            }
+        }
     }
 }
+
 
