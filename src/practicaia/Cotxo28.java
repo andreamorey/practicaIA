@@ -25,7 +25,7 @@ public class Cotxo28 extends Agent {
     int altreCotxe;
 
     public Cotxo28(Agents pare) {
-        super(pare, "Cotxo28", "imatges/amarillo.PNG");
+        super(pare, "Doc Hudson", "imatges/amarillo.PNG");
     }
 
     @Override
@@ -41,6 +41,7 @@ public class Cotxo28 extends Agent {
         estat = estatCombat();  // Recuperam la informació actualitzada de l'entorn
 
         altreCotxe = (estat.id + 1) % estat.numBitxos;
+
         if (espera > 0) {  // no facis res, continua amb el que estaves fent
             espera--;
             return;
@@ -50,6 +51,7 @@ public class Cotxo28 extends Agent {
         desquerra = estat.distanciaVisors[ESQUERRA];
         dcentral = estat.distanciaVisors[CENTRAL];
 
+        
         if (dcentral > 250) {
             setAngleVisors(10);
         } else {
@@ -77,7 +79,6 @@ public class Cotxo28 extends Agent {
                     endavant(estat.marxa - 1);
                 }
             }
-
             if (ddreta > desquerra) {
                 dreta();
             } else {
@@ -93,32 +94,15 @@ public class Cotxo28 extends Agent {
         } else if (estat.angleVisors == 40) {
             distanciaVis = 75;
         }
-
         if (estat.enCollisio) {
             //choca por detras
             atura();
             if ((dcentral > 20) && (desquerra > 20) && (ddreta > 20)) {
                 endavant(2);
-                //choca por la izquierda
-//            } else if ((dcentral > 15)
-//                    && (desquerra <= 15)
-//                    && (estat.distanciaVisors[DRETA] > 15)) {
-//                dreta();
-//                endavant(1);
-//                espera = 5;
-//                //choca por la derecha
-//            } else if ((estat.distanciaVisors[CENTRAL] > 15)
-//                    && (estat.distanciaVisors[ESQUERRA] > 15)
-//                    && (estat.distanciaVisors[DRETA] <= 15)) {
-//                esquerra();
-//                endavant(1);
-//                espera = 5;
-
             } else { //choca por delante
                 espera = 20;
                 noGiris();
                 enrere(2);
-
             }
             return;
         }
@@ -158,7 +142,6 @@ public class Cotxo28 extends Agent {
         //detecta coche con visor central y dispara
         if (estat.objecteVisor[CENTRAL] == COTXE) {
             dispara();
-
         }
     }
     //soltar taques oli si veo a otro coche
