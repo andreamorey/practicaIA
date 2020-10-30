@@ -25,7 +25,8 @@ public class Cotxo28 extends Agent {
     int altreCotxe;
 
     public Cotxo28(Agents pare) {
-        super(pare, "Mike W.", "imatges/amarillo.PNG");
+        super(pare, "Mi"
+ + "ke W.", "imatges/amarillo.PNG");
     }
 
     @Override
