@@ -25,7 +25,7 @@ public class Cotxo28 extends Agent {
     int altreCotxe;
 
     public Cotxo28(Agents pare) {
-        super(pare, "Doc Hudson", "imatges/amarillo.PNG");
+        super(pare, "Mike W.", "imatges/amarillo.PNG");
     }
 
     @Override
@@ -67,6 +67,11 @@ public class Cotxo28 extends Agent {
         posarOli();
     }
     private void controlGirs() {
+        if (estat.angleVisors == 10) {
+            distanciaVis = 180;
+        } else if (estat.angleVisors == 40) {
+            distanciaVis = 75;
+        }
         if (dcentral > 180 && (desquerra > distanciaVis) && (ddreta > distanciaVis)) {
             noGiris();
         } else {
@@ -89,11 +94,6 @@ public class Cotxo28 extends Agent {
 
     // cuando choca con coche o pared
     private void controlCollisions(){
-        if (estat.angleVisors == 10) {
-            distanciaVis = 180;
-        } else if (estat.angleVisors == 40) {
-            distanciaVis = 75;
-        }
         if (estat.enCollisio) {
             //choca por detras
             atura();
@@ -108,7 +108,7 @@ public class Cotxo28 extends Agent {
         }
     }
     private void controlRevolucions() {
-        if (estat.revolucions > 2500 && estat.marxa < 5 && dcentral > 200) {
+        if (estat.revolucions > 2500 && estat.marxa < 5) {
             endavant(estat.marxa + 1);
         } else {
             endavant(estat.marxa);
@@ -157,7 +157,6 @@ public class Cotxo28 extends Agent {
         } else if (estat.angleVisors == 40) {
             distanciaVis = 30;
         }
-        
         for (int i = 0; i < estat.numObjectes; i++) {
             if (estat.objectes[i].tipus == Agent.TACAOLI) {
                 esquivarTaques(i);
@@ -185,8 +184,8 @@ public class Cotxo28 extends Agent {
     private void agafarRecursos(int i){
         distanciaObj = estat.posicio.distancia(estat.objectes[i].posicio);
         if (distanciaObj < 100) {
-            setVelocitatAngular(6);
-            //espera = 3;  // andrea he comentado estoooo
+            setVelocitatAngular(5);
+            espera = 3;  
             if (estat.objectes[i].sector == 1 || estat.objectes[i].sector == 2) {
                 dreta();
             } else if (estat.objectes[i].sector == 3 || estat.objectes[i].sector == 4) {
